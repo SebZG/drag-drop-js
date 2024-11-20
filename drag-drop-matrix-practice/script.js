@@ -33,7 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
             touchStartThreshold: 3,
             scroll: true,
             scrollSensitivity: 10,
-            scrollSpeed: 5
+            scrollSpeed: 5,
+            forceFallback: true,
+            fallbackClass: 'sortable-drag'
         });
     });
 

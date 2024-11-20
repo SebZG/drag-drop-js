@@ -362,11 +362,18 @@ main > :first-child {
 }
 
 .sortable-drag {
-    max-width: 100% !important;
+    max-width: 350px !important;
     width: 100% !important;
     cursor: grabbing;
     transform: scale(1.05);
     box-shadow: 0 8px 16px var(--color-shadow-dark);
+}
+
+@media (max-width: 768px) {
+    .sortable-drag {
+        max-width: 85vw !important;
+        width: 85vw !important;
+    }
 }
 
 /***************************************
