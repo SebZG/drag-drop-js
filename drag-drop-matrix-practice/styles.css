@@ -1,0 +1,635 @@
+/***************************************
+ * CSS Variables
+ ***************************************/
+:root {
+    /* Colors */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-text: #333333;
+    --color-background: #f5f5f5;
+    --color-surface: var(--color-white);
+    --color-border: #e5e7eb;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+    --color-shadow-dark: rgba(0, 0, 0, 0.2);
+    
+    /* Matrix Colors */
+    --color-do: rgb(126, 217, 87);
+    --color-schedule: rgb(255, 222, 89);
+    --color-delegate: rgb(12, 192, 223);
+    --color-delete: rgb(255, 49, 49);
+    
+    /* UI Colors */
+    --color-primary: #2563eb;
+    --color-primary-dark: #1d4ed8;
+    --color-text-light: #6b7280;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+}
+
+/***************************************
+ * Reset & Base Styles
+ ***************************************/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.5;
+    overscroll-behavior: none;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text);
+}
+
+/***************************************
+ * Layout
+ ***************************************/
+main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+main > :first-child {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    height: calc(100vh - 2 * var(--spacing-lg));
+    width: 300px;
+}
+
+/***************************************
+ * Pomodoro Panel
+ ***************************************/
+#pomodoro-panel {
+    background: var(--color-surface);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    box-shadow: 0 1px 3px var(--color-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    flex: 0 0 180px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.pomodoro-container {
+    width: 100%;
+}
+
+/***************************************
+ * Task List Container
+ ***************************************/
+.task-list-container {
+    background: var(--color-surface);
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--color-shadow);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.task-list-container h2 {
+    padding: var(--spacing-md) var(--spacing-sm);
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-text);
+}
+
+#new-task-btn {
+    margin: 0 var(--spacing-sm) var(--spacing-sm);
+}
+
+.task-list {
+    flex: 1;
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    overflow-y: auto;
+    min-height: 200px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    min-width: 0;
+}
+
+.task-container, .task-list {
+    flex: 1;
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    overflow-y: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.task-container {
+    min-height: 0;
+}
+
+/***************************************
+ * Matrix Container
+ ***************************************/
+.matrix-container {
+    height: calc(100vh - 2 * var(--spacing-lg));
+}
+
+/***************************************
+ * Matrix
+ ***************************************/
+.matrix {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.quadrant {
+    background: var(--color-surface);
+    padding: var(--spacing-md);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--color-shadow);
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.quadrant h3 {
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    color: var(--color-text);
+    flex: 0 0 auto;
+}
+
+/***************************************
+ * Matrix Colors
+ ***************************************/
+.important-urgent {
+    background-color: rgba(126, 217, 87, 0.1);
+    border: 2px solid var(--color-do);
+}
+
+.important-urgent h3 {
+    color: var(--color-do);
+}
+
+.important-notUrgent {
+    background-color: rgba(255, 222, 89, 0.1);
+    border: 2px solid var(--color-schedule);
+}
+
+.important-notUrgent h3 {
+    color: var(--color-schedule);
+}
+
+.notImportant-urgent {
+    background-color: rgba(12, 192, 223, 0.1);
+    border: 2px solid var(--color-delegate);
+}
+
+.notImportant-urgent h3 {
+    color: var(--color-delegate);
+}
+
+.notImportant-notUrgent {
+    background-color: rgba(255, 49, 49, 0.1);
+    border: 2px solid var(--color-delete);
+}
+
+.notImportant-notUrgent h3 {
+    color: var(--color-delete);
+}
+
+/***************************************
+ * Tasks
+ ***************************************/
+.task {
+    display: flex;
+    align-items: center;
+    background: var(--color-surface);
+    margin-bottom: var(--spacing-sm);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px var(--color-shadow);
+    cursor: grab;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.task-content {
+    display: flex;
+    align-items: flex-start;
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 70px);
+    overflow: hidden;
+}
+
+.task-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.task-drag-handle {
+    cursor: grab;
+    padding: 0 var(--spacing-sm);
+    color: var(--color-text-light);
+    font-size: 1rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.task-edit-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.task-delete-btn {
+    opacity: 0;
+    color: var(--color-text-light);
+    background: none;
+    border: none;
+    padding: var(--spacing-xs);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.task:hover .task-delete-btn {
+    opacity: 1;
+}
+
+.task-delete-btn:hover {
+    color: var(--color-delete);
+    transform: scale(1.1);
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.edit-btn:active {
+    background: #e0e0e0;
+}
+
+/***************************************
+ * Sortable.js States
+ ***************************************/
+.sortable-ghost {
+    opacity: 0.5;
+    max-width: 100% !important;
+    width: 100% !important;
+    background-color: var(--color-background);
+    border: 2px dashed var(--color-border);
+}
+
+.sortable-chosen {
+    max-width: 100% !important;
+    width: 100% !important;
+    background: var(--color-surface);
+    box-shadow: 0 4px 8px var(--color-shadow-dark);
+}
+
+.sortable-drag {
+    max-width: 100% !important;
+    width: 100% !important;
+    cursor: grabbing;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px var(--color-shadow-dark);
+}
+
+/***************************************
+ * Dialog styles
+ ***************************************/
+dialog {
+    border: none;
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--color-shadow);
+    max-width: 90vw;
+    width: 500px;
+    margin: auto;
+    background: var(--color-surface);
+    display: none;
+}
+
+dialog[open] {
+    display: block;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font: inherit;
+    background: var(--color-white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-lg);
+}
+
+.dialog-buttons > div {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.delete-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-delete);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-delete);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: var(--color-delete);
+    color: var(--color-white);
+}
+
+/***************************************
+ * Buttons
+ ***************************************/
+button {
+    cursor: pointer;
+    border: none;
+    font: inherit;
+    color: inherit;
+}
+
+.primary-btn {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.cancel-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background: var(--color-background);
+    border-color: var(--color-text-light);
+}
+
+/***************************************
+ * Timer Styles
+ ***************************************/
+.timer-display {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-primary);
+}
+
+.timer-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-md);
+}
+
+.timer-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 4px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.timer-btn:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+.timer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.timer-settings {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-md);
+}
+
+.timer-mode {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 4px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+}
+
+.timer-mode:hover {
+    background: var(--color-border);
+}
+
+.timer-mode.active {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+/***************************************
+ * Responsive Design
+ ***************************************/
+/* Mobile (480px - 768px) */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+        padding: var(--spacing-sm);
+        gap: var(--spacing-md);
+    }
+    
+    main > :first-child,
+    .matrix-container {
+        height: auto;
+    }
+
+    .matrix {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, minmax(250px, auto));
+    }
+
+    .task-list {
+        min-height: 300px;
+    }
+
+    .task-container {
+        min-height: 300px;
+    }
+
+    .task {
+        padding: var(--spacing-md);
+    }
+
+    .task-delete-btn {
+        opacity: 1;
+        padding: var(--spacing-md);
+    }
+
+    .task-drag-handle {
+        padding: var(--spacing-sm);
+        font-size: 1.2rem;
+    }
+
+    dialog {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+        height: 100vh;
+        display: none;
+    }
+
+    dialog[open] {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dialog-buttons {
+        margin-top: auto;
+        padding-top: var(--spacing-lg);
+    }
+
+    .timer-display {
+        font-size: 3rem;
+    }
+
+    .timer-controls,
+    .timer-settings {
+        flex-wrap: wrap;
+    }
+
+    .timer-btn,
+    .timer-mode {
+        flex: 1;
+        min-width: 120px;
+    }
+}

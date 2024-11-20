@@ -3,6 +3,9 @@
         "draggables",
         "dragover",
         "dropzones",
-        "Greatstack"
+        "Greatstack",
+        "nums",
+        "ondropactivate",
+        "Pomodoro"
     ]
 }
