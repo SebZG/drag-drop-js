@@ -232,4 +232,112 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Timer Elements
+    const minutesDisplay = document.getElementById('minutes');
+    const secondsDisplay = document.getElementById('seconds');
+    const startButton = document.getElementById('start-timer');
+    const pauseButton = document.getElementById('pause-timer');
+    const resetButton = document.getElementById('reset-timer');
+    const timerModes = document.querySelectorAll('.timer-mode');
+
+    // Timer State
+    let timeLeft = 25 * 60; // 25 minutes in seconds
+    let timerId = null;
+    let isRunning = false;
+
+    // Timer Functions
+    function updateDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        minutesDisplay.textContent = minutes.toString().padStart(2, '0');
+        secondsDisplay.textContent = seconds.toString().padStart(2, '0');
+    }
+
+    function startTimer() {
+        if (!isRunning) {
+            isRunning = true;
+            startButton.disabled = true;
+            pauseButton.disabled = false;
+            
+            timerId = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    // Timer completed
+                    clearInterval(timerId);
+                    isRunning = false;
+                    startButton.disabled = false;
+                    pauseButton.disabled = true;
+                    
+                    // Play notification sound and show notification
+                    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                    audio.play();
+                    
+                    if (Notification.permission === 'granted') {
+                        const activeMode = document.querySelector('.timer-mode.active').textContent;
+                        const notificationMessage = activeMode === 'Pomodoro' 
+                            ? 'Time is up! Take a break.'
+                            : 'Break is over! Time to focus.';
+                            
+                        new Notification('Pomodoro Timer', {
+                            body: notificationMessage,
+                            icon: 'https://example.com/icon.png'
+                        });
+                    }
+                }
+            }, 1000);
+        }
+    }
+
+    function pauseTimer() {
+        if (isRunning) {
+            clearInterval(timerId);
+            isRunning = false;
+            startButton.disabled = false;
+            pauseButton.disabled = true;
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerId);
+        isRunning = false;
+        timeLeft = parseInt(document.querySelector('.timer-mode.active').dataset.time) * 60;
+        startButton.disabled = false;
+        pauseButton.disabled = true;
+        updateDisplay();
+    }
+
+    // Event Listeners for Timer
+    startButton.addEventListener('click', startTimer);
+    pauseButton.addEventListener('click', pauseTimer);
+    resetButton.addEventListener('click', resetTimer);
+
+    // Timer Mode Selection
+    timerModes.forEach(mode => {
+        mode.addEventListener('click', () => {
+            // Update active state
+            document.querySelector('.timer-mode.active').classList.remove('active');
+            mode.classList.add('active');
+            
+            // Update timer
+            timeLeft = parseInt(mode.dataset.time) * 60;
+            updateDisplay();
+            
+            // Reset timer state
+            clearInterval(timerId);
+            isRunning = false;
+            startButton.disabled = false;
+            pauseButton.disabled = true;
+        });
+    });
+
+    // Request notification permission
+    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+    }
+
+    // Initialize timer display
+    updateDisplay();
 });
