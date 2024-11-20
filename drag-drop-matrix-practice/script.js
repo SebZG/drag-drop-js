@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
             delayOnTouchOnly: true,
             touchStartThreshold: 3,
             scroll: true,
-            scrollSensitivity: 80,
-            scrollSpeed: 3
+            scrollSensitivity: 10,
+            scrollSpeed: 5
         });
     });
 
@@ -242,16 +242,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const timerModes = document.querySelectorAll('.timer-mode');
 
     // Timer State
-    let timeLeft = 25 * 60; // 25 minutes in seconds
-    let timerId = null;
+    let timeLeft = 25 * 60; // Default to 25 minutes
     let isRunning = false;
+    let timerId = null;
+    let isBreakTime = false;
+    let focusTime = 25;
+    let breakTime = 5;
 
     // Timer Functions
     function updateDisplay() {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
-        minutesDisplay.textContent = minutes.toString().padStart(2, '0');
-        secondsDisplay.textContent = seconds.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
     }
 
     function startTimer() {
@@ -268,42 +271,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Timer completed
                     clearInterval(timerId);
                     isRunning = false;
-                    startButton.disabled = false;
-                    pauseButton.disabled = true;
                     
-                    // Play notification sound and show notification
+                    // Play notification sound
                     const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
                     audio.play();
                     
                     if (Notification.permission === 'granted') {
-                        const activeMode = document.querySelector('.timer-mode.active').textContent;
-                        const notificationMessage = activeMode === 'Pomodoro' 
-                            ? 'Time is up! Take a break.'
-                            : 'Break is over! Time to focus.';
+                        const notificationMessage = isBreakTime
+                            ? 'Break is over! Time to focus.'
+                            : 'Time is up! Take a break.';
                             
                         new Notification('Pomodoro Timer', {
                             body: notificationMessage,
                             icon: 'https://example.com/icon.png'
                         });
                     }
+
+                    // Switch between focus and break time
+                    isBreakTime = !isBreakTime;
+                    timeLeft = (isBreakTime ? breakTime : focusTime) * 60;
+                    startButton.disabled = false;
+                    pauseButton.disabled = true;
+                    updateDisplay();
                 }
             }, 1000);
-        }
-    }
-
-    function pauseTimer() {
-        if (isRunning) {
-            clearInterval(timerId);
-            isRunning = false;
-            startButton.disabled = false;
-            pauseButton.disabled = true;
         }
     }
 
     function resetTimer() {
         clearInterval(timerId);
         isRunning = false;
-        timeLeft = parseInt(document.querySelector('.timer-mode.active').dataset.time) * 60;
+        isBreakTime = false;
+        timeLeft = focusTime * 60;
         startButton.disabled = false;
         pauseButton.disabled = true;
         updateDisplay();
@@ -311,26 +310,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners for Timer
     startButton.addEventListener('click', startTimer);
-    pauseButton.addEventListener('click', pauseTimer);
+    pauseButton.addEventListener('click', () => {
+        clearInterval(timerId);
+        isRunning = false;
+        startButton.disabled = false;
+        pauseButton.disabled = true;
+    });
     resetButton.addEventListener('click', resetTimer);
 
-    // Timer Mode Selection
-    timerModes.forEach(mode => {
-        mode.addEventListener('click', () => {
-            // Update active state
-            document.querySelector('.timer-mode.active').classList.remove('active');
-            mode.classList.add('active');
-            
-            // Update timer
-            timeLeft = parseInt(mode.dataset.time) * 60;
-            updateDisplay();
-            
-            // Reset timer state
-            clearInterval(timerId);
-            isRunning = false;
-            startButton.disabled = false;
-            pauseButton.disabled = true;
+    // Handle timer mode selection
+    document.querySelectorAll('.timer-mode').forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.id === 'custom-timer') {
+                document.getElementById('custom-settings').style.display = 'block';
+            } else {
+                document.getElementById('custom-settings').style.display = 'none';
+                document.querySelectorAll('.timer-mode').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                focusTime = parseInt(button.dataset.focus);
+                breakTime = parseInt(button.dataset.break);
+                resetTimer();
+            }
         });
+    });
+
+    // Handle custom timer settings
+    document.getElementById('apply-custom').addEventListener('click', () => {
+        focusTime = parseInt(document.getElementById('focus-time').value);
+        breakTime = parseInt(document.getElementById('break-time').value);
+        
+        // Create or update custom button data attributes
+        const customButton = document.getElementById('custom-timer');
+        customButton.dataset.focus = focusTime;
+        customButton.dataset.break = breakTime;
+        
+        document.querySelectorAll('.timer-mode').forEach(btn => btn.classList.remove('active'));
+        customButton.classList.add('active');
+        
+        document.getElementById('custom-settings').style.display = 'none';
+        resetTimer();
     });
 
     // Request notification permission

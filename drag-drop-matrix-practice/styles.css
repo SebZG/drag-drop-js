@@ -557,6 +557,40 @@ button {
 }
 
 /***************************************
+ * Custom Timer Settings
+ ***************************************/
+.custom-settings {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.custom-input {
+    margin-bottom: 1rem;
+}
+
+.custom-input label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.custom-input input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#apply-custom {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+/***************************************
  * Responsive Design
  ***************************************/
 /* Mobile (480px - 768px) */

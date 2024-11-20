@@ -19,9 +19,19 @@
                     <button id="reset-timer" class="timer-btn">Reset</button>
                 </div>
                 <div class="timer-settings">
-                    <button class="timer-mode active" data-time="25">Pomodoro</button>
-                    <button class="timer-mode" data-time="5">Short Break</button>
-                    <button class="timer-mode" data-time="15">Long Break</button>
+                    <button class="timer-mode active" data-focus="25" data-break="5">Classic</button>
+                    <button class="timer-mode" id="custom-timer">Custom</button>
+                </div>
+                <div id="custom-settings" class="custom-settings" style="display: none;">
+                    <div class="custom-input">
+                        <label for="focus-time">Focus Time (minutes):</label>
+                        <input type="number" id="focus-time" min="1" max="120" value="25">
+                    </div>
+                    <div class="custom-input">
+                        <label for="break-time">Break Time (minutes):</label>
+                        <input type="number" id="break-time" min="1" max="60" value="5">
+                    </div>
+                    <button id="apply-custom" class="timer-btn">Apply</button>
                 </div>
             </div>
             <div class="task-list-container">
