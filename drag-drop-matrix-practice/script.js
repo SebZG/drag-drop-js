@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editTitleInput = document.getElementById('edit-task-title');
         const editDescInput = document.getElementById('edit-task-description');
         const editDestSelect = document.getElementById('edit-task-destination');
-
+        
         if (!editTitleInput || !editDescInput || !editDestSelect) {
             console.error('Edit form elements not found');
             return;
@@ -235,129 +235,251 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Timer Elements
-    const minutesDisplay = document.getElementById('minutes');
-    const secondsDisplay = document.getElementById('seconds');
-    const startButton = document.getElementById('start-timer');
-    const pauseButton = document.getElementById('pause-timer');
-    const resetButton = document.getElementById('reset-timer');
-    const timerModes = document.querySelectorAll('.timer-mode');
+    // Timer state
+    let timerState = {
+        minutes: 25,
+        seconds: 0,
+        isRunning: false,
+        isFocusTime: true,
+        focusTime: 25,
+        breakTime: 5,
+        currentRound: 1,
+        totalRounds: 4,
+        autoStartBreaks: true,
+        timerInterval: null,
+        autoStartTimeout: null
+    };
 
-    // Timer State
-    let timeLeft = 25 * 60; // Default to 25 minutes
-    let isRunning = false;
-    let timerId = null;
-    let isBreakTime = false;
-    let focusTime = 25;
-    let breakTime = 5;
+    function updateTimerDisplay() {
+        document.getElementById('minutes').textContent = String(timerState.minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(timerState.seconds).padStart(2, '0');
+        document.getElementById('timer-phase').textContent = timerState.isFocusTime ? 'Focus Time' : 'Break Time';
+        document.getElementById('round-info').textContent = `Round ${timerState.currentRound}/${timerState.totalRounds}`;
+    }
 
-    // Timer Functions
-    function updateDisplay() {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    function handlePhaseComplete() {
+        console.log('Handling phase completion...');
+        console.log('Current state:', {
+            round: timerState.currentRound,
+            totalRounds: timerState.totalRounds,
+            isFocusTime: timerState.isFocusTime,
+            autoStartBreaks: timerState.autoStartBreaks
+        });
+        
+        if (timerState.isFocusTime) {
+            // Focus time completed
+            // Switch to break phase
+            timerState.isFocusTime = false;
+            timerState.minutes = timerState.breakTime;
+            timerState.seconds = 0;
+            updateTimerDisplay();
+            
+            // Show notification after state update
+            playNotificationAndSound('focus');
+            
+            // Auto-start break if enabled
+            if (timerState.autoStartBreaks) {
+                console.log('Auto-starting break...');
+                // Small delay to ensure UI updates first
+                setTimeout(() => {
+                    if (!timerState.isRunning) {
+                        startTimer();
+                    }
+                }, 100);
+            } else {
+                timerState.isRunning = false;
+                document.getElementById('start-timer').disabled = false;
+                document.getElementById('pause-timer').disabled = true;
+            }
+        } else {
+            // Break time completed
+            // Increment round counter after break completes
+            timerState.currentRound++;
+            console.log(`Completed round ${timerState.currentRound - 1}, starting round ${timerState.currentRound}`);
+            
+            // Check if we've completed all rounds
+            if (timerState.currentRound > timerState.totalRounds) {
+                console.log('All rounds completed!');
+                playNotificationAndSound('complete');
+                resetTimer();
+                return;
+            }
+            
+            // Switch to focus phase
+            timerState.isFocusTime = true;
+            timerState.minutes = timerState.focusTime;
+            timerState.seconds = 0;
+            timerState.isRunning = false;
+            updateTimerDisplay();
+            
+            // Show notification after state update
+            playNotificationAndSound('break');
+            
+            // Reset button states for manual start of focus time
+            document.getElementById('start-timer').disabled = false;
+            document.getElementById('pause-timer').disabled = true;
+        }
+    }
+
+    function playNotificationAndSound(phase) {
+        // Play sound if available
+        const audio = document.getElementById('timer-sound');
+        if (audio) {
+            audio.play().catch(error => console.log('Error playing sound:', error));
+        }
+
+        // Show notification if permission is granted
+        if (Notification.permission === "granted") {
+            let title, message;
+            
+            switch(phase) {
+                case 'focus':
+                    title = 'Focus Session Complete';
+                    message = 'Time for a break';
+                    break;
+                case 'break':
+                    title = 'Break Complete';
+                    message = 'Time to focus';
+                    break;
+                case 'complete':
+                    title = 'Pomodoro Complete';
+                    message = 'Well done!';
+                    break;
+            }
+            
+            new Notification(title, {
+                body: message,
+                icon: '/path/to/icon.png'
+            });
+        }
+    }
+
+    function resetTimer() {
+        console.log('Resetting timer...');
+        clearInterval(timerState.timerInterval);
+        timerState.isRunning = false;
+        timerState.isFocusTime = true;
+        timerState.minutes = timerState.focusTime;
+        timerState.seconds = 0;
+        timerState.currentRound = 1;
+        document.getElementById('start-timer').disabled = false;
+        document.getElementById('pause-timer').disabled = true;
+        updateTimerDisplay();
+        
+        // Show completion notification if all rounds were completed
+        if (timerState.currentRound > timerState.totalRounds) {
+            if (Notification.permission === "granted") {
+                new Notification('Congratulations!', {
+                    body: 'You have completed all rounds!',
+                    icon: '/path/to/icon.png'
+                });
+            }
+        }
     }
 
     function startTimer() {
-        if (!isRunning) {
-            isRunning = true;
-            startButton.disabled = true;
-            pauseButton.disabled = false;
+        if (!timerState.isRunning) {
+            console.log(`Starting ${timerState.isFocusTime ? 'focus' : 'break'} timer for round ${timerState.currentRound}...`);
+            timerState.isRunning = true;
+            document.getElementById('start-timer').disabled = true;
+            document.getElementById('pause-timer').disabled = false;
             
-            timerId = setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    updateDisplay();
-                } else {
+            timerState.timerInterval = setInterval(() => {
+                if (timerState.minutes === 0 && timerState.seconds === 0) {
                     // Timer completed
-                    clearInterval(timerId);
-                    isRunning = false;
-                    
-                    // Play notification sound
-                    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-                    audio.play();
-                    
-                    if (Notification.permission === 'granted') {
-                        const notificationMessage = isBreakTime
-                            ? 'Break is over! Time to focus.'
-                            : 'Time is up! Take a break.';
-                            
-                        new Notification('Pomodoro Timer', {
-                            body: notificationMessage,
-                            icon: 'https://example.com/icon.png'
-                        });
+                    console.log(`${timerState.isFocusTime ? 'Focus' : 'Break'} timer completed`);
+                    clearInterval(timerState.timerInterval);
+                    timerState.isRunning = false;
+                    handlePhaseComplete();
+                } else {
+                    if (timerState.seconds === 0) {
+                        timerState.minutes--;
+                        timerState.seconds = 59;
+                    } else {
+                        timerState.seconds--;
                     }
-
-                    // Switch between focus and break time
-                    isBreakTime = !isBreakTime;
-                    timeLeft = (isBreakTime ? breakTime : focusTime) * 60;
-                    startButton.disabled = false;
-                    pauseButton.disabled = true;
-                    updateDisplay();
+                    updateTimerDisplay();
                 }
             }, 1000);
         }
     }
 
-    function resetTimer() {
-        clearInterval(timerId);
-        isRunning = false;
-        isBreakTime = false;
-        timeLeft = focusTime * 60;
-        startButton.disabled = false;
-        pauseButton.disabled = true;
-        updateDisplay();
-    }
-
-    // Event Listeners for Timer
-    startButton.addEventListener('click', startTimer);
-    pauseButton.addEventListener('click', () => {
-        clearInterval(timerId);
-        isRunning = false;
-        startButton.disabled = false;
-        pauseButton.disabled = true;
+    // Timer mode and settings handlers
+    document.getElementById('settings-toggle').addEventListener('click', () => {
+        const settingsPanel = document.getElementById('timer-common-settings');
+        const customPanel = document.getElementById('custom-settings');
+        
+        if (settingsPanel.style.display === 'none') {
+            settingsPanel.style.display = 'block';
+            customPanel.style.display = 'none';
+        } else {
+            settingsPanel.style.display = 'none';
+        }
     });
-    resetButton.addEventListener('click', resetTimer);
+
+    document.getElementById('apply-settings').addEventListener('click', () => {
+        timerState.totalRounds = parseInt(document.getElementById('rounds').value);
+        timerState.autoStartBreaks = document.getElementById('auto-start-breaks').checked;
+        document.getElementById('timer-common-settings').style.display = 'none';
+        updateTimerDisplay();
+    });
 
     // Handle timer mode selection
     document.querySelectorAll('.timer-mode').forEach(button => {
         button.addEventListener('click', () => {
             if (button.id === 'custom-timer') {
                 document.getElementById('custom-settings').style.display = 'block';
+                document.getElementById('timer-common-settings').style.display = 'none';
             } else {
                 document.getElementById('custom-settings').style.display = 'none';
+                document.getElementById('timer-common-settings').style.display = 'none';
                 document.querySelectorAll('.timer-mode').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                focusTime = parseInt(button.dataset.focus);
-                breakTime = parseInt(button.dataset.break);
+                timerState.focusTime = parseInt(button.dataset.focus);
+                timerState.breakTime = parseInt(button.dataset.break);
                 resetTimer();
             }
         });
     });
 
-    // Handle custom timer settings
     document.getElementById('apply-custom').addEventListener('click', () => {
-        focusTime = parseInt(document.getElementById('focus-time').value);
-        breakTime = parseInt(document.getElementById('break-time').value);
+        // Preserve current rounds and auto-start settings
+        const currentRounds = timerState.totalRounds;
+        const currentAutoStart = timerState.autoStartBreaks;
         
-        // Create or update custom button data attributes
-        const customButton = document.getElementById('custom-timer');
-        customButton.dataset.focus = focusTime;
-        customButton.dataset.break = breakTime;
+        timerState.focusTime = parseInt(document.getElementById('focus-time').value);
+        timerState.breakTime = parseInt(document.getElementById('break-time').value);
         
-        document.querySelectorAll('.timer-mode').forEach(btn => btn.classList.remove('active'));
-        customButton.classList.add('active');
+        // Restore preserved settings
+        timerState.totalRounds = currentRounds;
+        timerState.autoStartBreaks = currentAutoStart;
         
         document.getElementById('custom-settings').style.display = 'none';
+        document.querySelectorAll('.timer-mode').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('custom-timer').classList.add('active');
+        
         resetTimer();
     });
 
-    // Request notification permission
-    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-        Notification.requestPermission();
+    // Add timer control event listeners
+    document.getElementById('start-timer').addEventListener('click', startTimer);
+    document.getElementById('pause-timer').addEventListener('click', () => {
+        clearInterval(timerState.timerInterval);
+        timerState.isRunning = false;
+        document.getElementById('start-timer').disabled = false;
+        document.getElementById('pause-timer').disabled = true;
+    });
+    document.getElementById('reset-timer').addEventListener('click', resetTimer);
+
+    // Request notification permission when the page loads
+    if ("Notification" in window) {
+        Notification.requestPermission().then(function (permission) {
+            console.log('Notification permission:', permission);
+        });
     }
 
-    // Initialize timer display
-    updateDisplay();
+    // Initialize timer display and settings
+    document.getElementById('rounds').value = timerState.totalRounds;
+    document.getElementById('auto-start-breaks').checked = timerState.autoStartBreaks;
+    updateTimerDisplay();
 });
