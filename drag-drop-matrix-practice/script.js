@@ -430,6 +430,119 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Settings dialog event listeners
+    const settingsDialog = document.getElementById('settings-dialog');
+    const customSettingsDialog = document.getElementById('custom-settings-dialog');
+
+    document.getElementById('settings-toggle').addEventListener('click', () => {
+        settingsDialog.showModal();
+    });
+
+    document.getElementById('custom-timer').addEventListener('click', () => {
+        customSettingsDialog.showModal();
+    });
+
+    document.getElementById('cancel-settings').addEventListener('click', () => {
+        settingsDialog.close();
+    });
+
+    document.getElementById('cancel-custom').addEventListener('click', () => {
+        customSettingsDialog.close();
+    });
+
+    // Close dialogs when clicking outside
+    [settingsDialog, customSettingsDialog].forEach(dialog => {
+        dialog.addEventListener('click', (e) => {
+            const dialogDimensions = dialog.getBoundingClientRect();
+            if (
+                e.clientX < dialogDimensions.left ||
+                e.clientX > dialogDimensions.right ||
+                e.clientY < dialogDimensions.top ||
+                e.clientY > dialogDimensions.bottom
+            ) {
+                dialog.close();
+            }
+        });
+    });
+
+    document.getElementById('apply-settings').addEventListener('click', () => {
+        const newRounds = parseInt(document.getElementById('rounds').value);
+        const autoStartBreaks = document.getElementById('auto-start-breaks').checked;
+        const autoStartRounds = document.getElementById('auto-start-rounds').checked;
+        const showNotifications = document.getElementById('show-notifications').checked;
+        
+        if (newRounds !== timerState.totalRounds || 
+            autoStartBreaks !== timerState.autoStartBreaks ||
+            autoStartRounds !== timerState.autoStartRounds ||
+            showNotifications !== timerState.showNotifications) {
+            
+            timerState.totalRounds = newRounds;
+            timerState.autoStartBreaks = autoStartBreaks;
+            timerState.autoStartRounds = autoStartRounds;
+            timerState.showNotifications = showNotifications;
+            
+            // Request notification permission if notifications are enabled
+            if (showNotifications) {
+                requestNotificationPermission();
+            }
+            
+            // Only reset if timer isn't running
+            if (!timerState.isRunning) {
+                resetTimer();
+            }
+            updateTimerDisplay();
+        }
+        
+        settingsDialog.close();
+    });
+
+    document.getElementById('apply-custom').addEventListener('click', () => {
+        const focusTime = parseInt(document.getElementById('focus-time').value);
+        const breakTime = parseInt(document.getElementById('break-time').value);
+        
+        if (focusTime !== timerState.focusTime || breakTime !== timerState.breakTime) {
+            timerState.focusTime = focusTime;
+            timerState.breakTime = breakTime;
+            
+            // Only reset if timer isn't running
+            if (!timerState.isRunning) {
+                resetTimer();
+            }
+            updateTimerDisplay();
+        }
+        
+        customSettingsDialog.close();
+    });
+
+    // Number input controls
+    document.getElementById('decrease-rounds').addEventListener('click', () => {
+        const input = document.getElementById('rounds');
+        const currentValue = parseInt(input.value);
+        if (currentValue > parseInt(input.min)) {
+            input.value = currentValue - 1;
+        }
+    });
+
+    document.getElementById('increase-rounds').addEventListener('click', () => {
+        const input = document.getElementById('rounds');
+        const currentValue = parseInt(input.value);
+        if (currentValue < parseInt(input.max)) {
+            input.value = currentValue + 1;
+        }
+    });
+
+    // Ensure rounds input stays within bounds
+    document.getElementById('rounds').addEventListener('change', (e) => {
+        const input = e.target;
+        const value = parseInt(input.value);
+        const min = parseInt(input.min);
+        const max = parseInt(input.max);
+        
+        if (value < min) input.value = min;
+        if (value > max) input.value = max;
+        if (isNaN(value)) input.value = min;
+    });
+
     // Timer mode and settings handlers
     document.getElementById('settings-toggle').addEventListener('click', () => {
         const settingsPanel = document.getElementById('timer-common-settings');

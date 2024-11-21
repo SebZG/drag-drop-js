@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eisenhower Matrix with Pomodoro</title>
+    <title>Pomodoro Timer with Task Management</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,28 +11,42 @@
         <section id="pomodoro-panel">
             <div class="pomodoro-container">
                 <div class="timer-display">
-                    <span id="minutes">25</span>:<span id="seconds">00</span>
-                </div>
-                <div class="timer-info">
-                    <span id="timer-phase">Focus Time</span>
-                    <span id="round-info">Round 1/4</span>
+                    <div id="timer">
+                        <span id="minutes">25</span>:<span id="seconds">00</span>
+                    </div>
+                    <div id="timer-phase">Focus Time</div>
+                    <div id="round-info">Round 1/4</div>
                 </div>
                 <div class="timer-controls">
                     <button id="start-timer" class="timer-btn">Start</button>
                     <button id="pause-timer" class="timer-btn" disabled>Pause</button>
                     <button id="reset-timer" class="timer-btn">Reset</button>
                 </div>
-                <div class="timer-settings">
+                <div class="timer-modes">
                     <button class="timer-mode active" data-focus="25" data-break="5">Classic</button>
                     <button class="timer-mode" id="custom-timer">Custom</button>
-                    <button id="settings-toggle" class="settings-btn">⚙️ Settings</button>
+                    <button id="settings-toggle" class="timer-mode">Settings</button>
                 </div>
-                <div id="timer-common-settings" class="settings-panel" style="display: none;">
+            </div>
+
+            <div class="task-list-container">
+                <h2>Task List</h2>
+                <button id="new-task-btn" class="primary-btn">New Task</button>
+                <div class="task-list"></div>
+            </div>
+
+            <!-- Settings Dialog -->
+            <dialog id="settings-dialog" class="settings-dialog">
+                <div class="dialog-content">
+                    <h2>Timer Settings</h2>
                     <div class="settings-group">
-                        <h3>Timer Settings</h3>
-                        <div class="settings-item">
-                            <label for="rounds">Number of Rounds:</label>
-                            <input type="number" id="rounds" min="1" max="10" value="4">
+                        <div class="settings-item number-input">
+                            <label for="rounds">Number of Rounds</label>
+                            <div class="number-control">
+                                <button class="number-btn" id="decrease-rounds">-</button>
+                                <input type="number" id="rounds" min="1" max="10" value="4">
+                                <button class="number-btn" id="increase-rounds">+</button>
+                            </div>
                         </div>
                         <div class="settings-item checkbox-input">
                             <label>
@@ -52,12 +66,19 @@
                                 Show notifications
                             </label>
                         </div>
-                        <button id="apply-settings" class="timer-btn">Apply Settings</button>
+                    </div>
+                    <div class="dialog-buttons">
+                        <button id="cancel-settings" class="btn">Cancel</button>
+                        <button id="apply-settings" class="btn primary">Apply Settings</button>
                     </div>
                 </div>
-                <div id="custom-settings" class="settings-panel" style="display: none;">
+            </dialog>
+
+            <!-- Custom Timer Dialog -->
+            <dialog id="custom-settings-dialog" class="settings-dialog">
+                <div class="dialog-content">
+                    <h2>Custom Timer</h2>
                     <div class="settings-group">
-                        <h3>Custom Timer</h3>
                         <div class="settings-item">
                             <label for="focus-time">Focus Time (minutes):</label>
                             <input type="number" id="focus-time" min="1" max="120" value="25">
@@ -66,15 +87,13 @@
                             <label for="break-time">Break Time (minutes):</label>
                             <input type="number" id="break-time" min="1" max="60" value="5">
                         </div>
-                        <button id="apply-custom" class="timer-btn">Apply Custom Timer</button>
+                    </div>
+                    <div class="dialog-buttons">
+                        <button id="cancel-custom" class="btn">Cancel</button>
+                        <button id="apply-custom" class="btn primary">Apply</button>
                     </div>
                 </div>
-            </div>
-            <div class="task-list-container">
-                <h2>Task List</h2>
-                <button id="new-task-btn" class="primary-btn">New Task</button>
-                <div class="task-list"></div>
-            </div>
+            </dialog>
         </section>
 
         <section id="matrix-panel">
