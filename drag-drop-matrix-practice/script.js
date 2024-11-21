@@ -247,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalRounds: 4,
         autoStartBreaks: true,
         autoStartRounds: true,
+        showNotifications: true,
         timerInterval: null
     };
 
@@ -340,14 +341,14 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.play().catch(error => console.log('Error playing sound:', error));
         }
 
-        // Show notification if permission is granted
-        if (Notification.permission === "granted") {
+        // Show notification if enabled and permission is granted
+        if (timerState.showNotifications && Notification.permission === "granted") {
             let title, message;
             
             switch(phase) {
                 case 'focus':
                     if (timerState.currentRound === timerState.totalRounds) {
-                        title = 'Final focus Session Complete';
+                        title = 'Final Focus Session Complete';
                         message = 'Final break session - Almost there!';
                     } else {
                         title = 'Focus Session Complete';
@@ -367,6 +368,14 @@ document.addEventListener('DOMContentLoaded', () => {
             new Notification(title, {
                 body: message,
                 icon: '/path/to/icon.png'
+            });
+        }
+    }
+
+    function requestNotificationPermission() {
+        if (timerState.showNotifications && "Notification" in window) {
+            Notification.requestPermission().then(function (permission) {
+                console.log('Notification permission:', permission);
             });
         }
     }
@@ -438,14 +447,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const newRounds = parseInt(document.getElementById('rounds').value);
         const autoStartBreaks = document.getElementById('auto-start-breaks').checked;
         const autoStartRounds = document.getElementById('auto-start-rounds').checked;
+        const showNotifications = document.getElementById('show-notifications').checked;
         
         if (newRounds !== timerState.totalRounds || 
             autoStartBreaks !== timerState.autoStartBreaks ||
-            autoStartRounds !== timerState.autoStartRounds) {
+            autoStartRounds !== timerState.autoStartRounds ||
+            showNotifications !== timerState.showNotifications) {
             
             timerState.totalRounds = newRounds;
             timerState.autoStartBreaks = autoStartBreaks;
             timerState.autoStartRounds = autoStartRounds;
+            timerState.showNotifications = showNotifications;
+            
+            // Request notification permission if notifications are enabled
+            if (showNotifications) {
+                requestNotificationPermission();
+            }
             
             // Only reset if timer isn't running
             if (!timerState.isRunning) {
@@ -503,15 +520,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('reset-timer').addEventListener('click', resetTimer);
 
     // Request notification permission when the page loads
-    if ("Notification" in window) {
-        Notification.requestPermission().then(function (permission) {
-            console.log('Notification permission:', permission);
-        });
+    if (timerState.showNotifications) {
+        requestNotificationPermission();
     }
 
     // Initialize timer display and settings
     document.getElementById('rounds').value = timerState.totalRounds;
     document.getElementById('auto-start-breaks').checked = timerState.autoStartBreaks;
     document.getElementById('auto-start-rounds').checked = timerState.autoStartRounds;
+    document.getElementById('show-notifications').checked = timerState.showNotifications;
     updateTimerDisplay();
 });
