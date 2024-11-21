@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Timer with Task Management</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <main>
+
         <section id="pomodoro-panel">
+
             <div class="pomodoro-container">
                 <div class="timer-display">
                     <div id="timer">
@@ -35,68 +39,10 @@
                 <div class="task-list"></div>
             </div>
 
-            <!-- Settings Dialog -->
-            <dialog id="settings-dialog" class="settings-dialog">
-                <div class="dialog-content">
-                    <h2>Timer Settings</h2>
-                    <div class="settings-group">
-                        <div class="settings-item number-input">
-                            <label for="rounds">Number of Rounds</label>
-                            <div class="number-control">
-                                <button class="number-btn" id="decrease-rounds">-</button>
-                                <input type="number" id="rounds" min="1" max="10" value="4">
-                                <button class="number-btn" id="increase-rounds">+</button>
-                            </div>
-                        </div>
-                        <div class="settings-item checkbox-input">
-                            <label>
-                                <input type="checkbox" id="auto-start-breaks" checked>
-                                Auto-start breaks
-                            </label>
-                        </div>
-                        <div class="settings-item checkbox-input">
-                            <label>
-                                <input type="checkbox" id="auto-start-rounds" checked>
-                                Auto-start rounds
-                            </label>
-                        </div>
-                        <div class="settings-item checkbox-input">
-                            <label>
-                                <input type="checkbox" id="show-notifications" checked>
-                                Show notifications
-                            </label>
-                        </div>
-                    </div>
-                    <div class="dialog-buttons">
-                        <button id="cancel-settings" class="btn">Cancel</button>
-                        <button id="apply-settings" class="btn primary">Apply Settings</button>
-                    </div>
-                </div>
-            </dialog>
-
-            <!-- Custom Timer Dialog -->
-            <dialog id="custom-settings-dialog" class="settings-dialog">
-                <div class="dialog-content">
-                    <h2>Custom Timer</h2>
-                    <div class="settings-group">
-                        <div class="settings-item">
-                            <label for="focus-time">Focus Time (minutes):</label>
-                            <input type="number" id="focus-time" min="1" max="120" value="25">
-                        </div>
-                        <div class="settings-item">
-                            <label for="break-time">Break Time (minutes):</label>
-                            <input type="number" id="break-time" min="1" max="60" value="5">
-                        </div>
-                    </div>
-                    <div class="dialog-buttons">
-                        <button id="cancel-custom" class="btn">Cancel</button>
-                        <button id="apply-custom" class="btn primary">Apply</button>
-                    </div>
-                </div>
-            </dialog>
         </section>
 
         <section id="matrix-panel">
+
             <div class="matrix-container">
                 <div class="matrix">
                     <div class="quadrant important-urgent">
@@ -117,10 +63,13 @@
                     </div>
                 </div>
             </div>
+
         </section>
+
     </main>
 
     <dialog id="task-dialog">
+
         <form id="task-form">
             <h3>Create New Task</h3>
             <div class="form-group">
@@ -146,9 +95,11 @@
                 <button type="submit" class="primary-btn">Add Task</button>
             </div>
         </form>
+
     </dialog>
 
     <dialog id="edit-task-dialog">
+
         <form id="edit-task-form">
             <h3>Edit Task</h3>
             <div class="form-group">
@@ -175,9 +126,73 @@
                 <button type="submit" class="primary-btn">Save Changes</button>
             </div>
         </form>
+
+    </dialog>
+
+    <dialog id="custom-settings-dialog" class="settings-dialog">
+
+        <div class="dialog-content">
+            <h2>Custom Timer</h2>
+            <div class="settings-group">
+                <div class="settings-item">
+                    <label for="focus-time">Focus Time (minutes):</label>
+                    <input type="number" id="focus-time" min="1" max="120" value="25">
+                </div>
+                <div class="settings-item">
+                    <label for="break-time">Break Time (minutes):</label>
+                    <input type="number" id="break-time" min="1" max="60" value="5">
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button id="cancel-custom" class="btn">Cancel</button>
+                <button id="apply-custom" class="btn primary">Apply</button>
+            </div>
+        </div>
+
+    </dialog>
+
+    <dialog id="settings-dialog" class="settings-dialog">
+
+        <div class="dialog-content">
+            <h2>Timer Settings</h2>
+            <div class="settings-group">
+                <div class="settings-item number-input">
+                    <label for="rounds">Number of Rounds</label>
+                    <div class="number-control">
+                        <button class="number-btn" id="decrease-rounds">-</button>
+                        <input type="number" id="rounds" min="1" max="10" value="4">
+                        <button class="number-btn" id="increase-rounds">+</button>
+                    </div>
+                </div>
+                <div class="settings-item checkbox-input">
+                    <label>
+                        <input type="checkbox" id="auto-start-breaks" checked>
+                        Auto-start breaks
+                    </label>
+                </div>
+                <div class="settings-item checkbox-input">
+                    <label>
+                        <input type="checkbox" id="auto-start-rounds" checked>
+                        Auto-start rounds
+                    </label>
+                </div>
+                <div class="settings-item checkbox-input">
+                    <label>
+                        <input type="checkbox" id="show-notifications" checked>
+                        Show notifications
+                    </label>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button id="cancel-settings" class="btn">Cancel</button>
+                <button id="apply-settings" class="btn primary">Apply Settings</button>
+            </div>
+        </div>
+
     </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
