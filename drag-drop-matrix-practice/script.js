@@ -334,16 +334,21 @@ document.addEventListener('DOMContentLoaded', () => {
             
             switch(phase) {
                 case 'focus':
-                    title = 'Focus Session Complete';
-                    message = 'Time for a break';
+                    if (timerState.currentRound === timerState.totalRounds) {
+                        title = 'Final focus Session Complete';
+                        message = 'Final break session - Almost there!';
+                    } else {
+                        title = 'Focus Session Complete';
+                        message = 'Time for a break';
+                    }
                     break;
                 case 'break':
                     title = 'Break Complete';
                     message = 'Time to focus';
                     break;
                 case 'complete':
-                    title = 'Pomodoro Complete';
-                    message = 'Well done!';
+                    title = 'Congratulations!';
+                    message = `You've completed all ${timerState.totalRounds} rounds!`;
                     break;
             }
             
