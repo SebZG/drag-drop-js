@@ -246,8 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRound: 1,
         totalRounds: 4,
         autoStartBreaks: true,
-        timerInterval: null,
-        autoStartTimeout: null
+        autoStartRounds: true,
+        timerInterval: null
     };
 
     function updateTimerDisplay() {
@@ -263,7 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
             round: timerState.currentRound,
             totalRounds: timerState.totalRounds,
             isFocusTime: timerState.isFocusTime,
-            autoStartBreaks: timerState.autoStartBreaks
+            autoStartBreaks: timerState.autoStartBreaks,
+            autoStartRounds: timerState.autoStartRounds
         });
         
         if (timerState.isFocusTime) {
@@ -315,9 +316,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show notification after state update
             playNotificationAndSound('break');
             
-            // Reset button states for manual start of focus time
-            document.getElementById('start-timer').disabled = false;
-            document.getElementById('pause-timer').disabled = true;
+            // Auto-start next round if enabled
+            if (timerState.autoStartRounds) {
+                console.log('Auto-starting next round...');
+                // Small delay to ensure UI updates first
+                setTimeout(() => {
+                    if (!timerState.isRunning) {
+                        startTimer();
+                    }
+                }, 100);
+            } else {
+                // Reset button states for manual start of focus time
+                document.getElementById('start-timer').disabled = false;
+                document.getElementById('pause-timer').disabled = true;
+            }
         }
     }
 
@@ -423,10 +435,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('apply-settings').addEventListener('click', () => {
-        timerState.totalRounds = parseInt(document.getElementById('rounds').value);
-        timerState.autoStartBreaks = document.getElementById('auto-start-breaks').checked;
-        document.getElementById('timer-common-settings').style.display = 'none';
-        updateTimerDisplay();
+        const newRounds = parseInt(document.getElementById('rounds').value);
+        const autoStartBreaks = document.getElementById('auto-start-breaks').checked;
+        const autoStartRounds = document.getElementById('auto-start-rounds').checked;
+        
+        if (newRounds !== timerState.totalRounds || 
+            autoStartBreaks !== timerState.autoStartBreaks ||
+            autoStartRounds !== timerState.autoStartRounds) {
+            
+            timerState.totalRounds = newRounds;
+            timerState.autoStartBreaks = autoStartBreaks;
+            timerState.autoStartRounds = autoStartRounds;
+            
+            // Only reset if timer isn't running
+            if (!timerState.isRunning) {
+                resetTimer();
+            }
+            updateTimerDisplay();
+        }
     });
 
     // Handle timer mode selection
@@ -486,5 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize timer display and settings
     document.getElementById('rounds').value = timerState.totalRounds;
     document.getElementById('auto-start-breaks').checked = timerState.autoStartBreaks;
+    document.getElementById('auto-start-rounds').checked = timerState.autoStartRounds;
     updateTimerDisplay();
 });
